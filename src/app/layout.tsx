@@ -5,6 +5,7 @@ import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from '@/components/theme-provider';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'Geek Calculator Hub',
@@ -32,6 +33,12 @@ export default function RootLayout({
           'min-h-dvh bg-background font-body antialiased'
         )}
       >
+        <Script
+          src="https://quge5.com/88/tag.min.js"
+          data-zone="191095"
+          async
+          data-cfasync="false"
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
