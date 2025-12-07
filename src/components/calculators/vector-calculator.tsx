@@ -40,6 +40,40 @@ type HistoryEntry = {
     timestamp: string;
 }
 
+const VectorInput = ({ id, label, is3D }: { id: 1 | 2; label: string, is3D: boolean }) => (
+  <div className="space-y-2">
+    <h3 className="font-semibold text-lg">{label}</h3>
+    <div className="grid grid-cols-3 gap-2">
+      <FormField name={`v${id}_x`} render={({ field }) => <FormItem><FormLabel>x</FormLabel><FormControl><Input type="number" step="any" {...field} /></FormControl></FormItem>} />
+      <FormField name={`v${id}_y`} render={({ field }) => <FormItem><FormLabel>y</FormLabel><FormControl><Input type="number" step="any" {...field} /></FormControl></FormItem>} />
+      {is3D && <FormField name={`v${id}_z`} render={({ field }) => <FormItem><FormLabel>z</FormLabel><FormControl><Input type="number" step="any" {...field} /></FormControl></FormItem>} />}
+    </div>
+  </div>
+);
+
+const ResultDisplay = ({ res, op, is3D }: { res: Vector | number | string | null; op: string, is3D: boolean }) => {
+  if (res === null) return null;
+  
+  let displayValue: string;
+  if (typeof res === 'object') {
+      displayValue = `( ${res.x.toFixed(4)}, ${res.y.toFixed(4)}${is3D ? `, ${res.z.toFixed(4)}` : ''} )`;
+  } else {
+      displayValue = res.toString();
+  }
+
+  return (
+      <Card>
+          <CardHeader>
+              <CardTitle>Result: {op}</CardTitle>
+          </CardHeader>
+          <CardContent>
+              <p className="font-code text-2xl font-bold">{displayValue}</p>
+          </CardContent>
+      </Card>
+  );
+};
+
+
 export function VectorCalculator() {
   const [is3D, setIs3D] = useState(true);
   const [result, setResult] = useState<Vector | number | string | null>(null);
@@ -115,39 +149,6 @@ export function VectorCalculator() {
     }
   };
 
-  const VectorInput = ({ id, label }: { id: 1 | 2; label: string }) => (
-    <div className="space-y-2">
-      <h3 className="font-semibold text-lg">{label}</h3>
-      <div className="grid grid-cols-3 gap-2">
-        <FormField name={`v${id}_x`} render={({ field }) => <FormItem><FormLabel>x</FormLabel><FormControl><Input type="number" step="any" {...field} /></FormControl></FormItem>} />
-        <FormField name={`v${id}_y`} render={({ field }) => <FormItem><FormLabel>y</FormLabel><FormControl><Input type="number" step="any" {...field} /></FormControl></FormItem>} />
-        {is3D && <FormField name={`v${id}_z`} render={({ field }) => <FormItem><FormLabel>z</FormLabel><FormControl><Input type="number" step="any" {...field} /></FormControl></FormItem>} />}
-      </div>
-    </div>
-  );
-
-  const ResultDisplay = ({ res, op }: { res: Vector | number | string | null; op: string }) => {
-    if (res === null) return null;
-    
-    let displayValue: string;
-    if (typeof res === 'object') {
-        displayValue = `( ${res.x.toFixed(4)}, ${res.y.toFixed(4)}${is3D ? `, ${res.z.toFixed(4)}` : ''} )`;
-    } else {
-        displayValue = res.toString();
-    }
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Result: {op}</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="font-code text-2xl font-bold">{displayValue}</p>
-            </CardContent>
-        </Card>
-    );
-  };
-
   return (
     <div className="space-y-8">
       <Card>
@@ -166,8 +167,8 @@ export function VectorCalculator() {
           {isClient ? (
             <Form {...form}>
               <form className="grid md:grid-cols-2 gap-8">
-                <VectorInput id={1} label="Vector v1" />
-                <VectorInput id={2} label="Vector v2" />
+                <VectorInput id={1} label="Vector v1" is3D={is3D} />
+                <VectorInput id={2} label="Vector v2" is3D={is3D} />
               </form>
             </Form>
           ) : (
@@ -187,7 +188,7 @@ export function VectorCalculator() {
         </CardContent>
       </Card>
       
-      {result !== null && <ResultDisplay res={result} op={operation} />}
+      {result !== null && <ResultDisplay res={result} op={operation} is3D={is3D} />}
       
       {isClient && history.length > 0 && (
         <Card>
@@ -195,7 +196,7 @@ export function VectorCalculator() {
             <CardContent className="space-y-4">
                 {history.map((h, i) => (
                     <div key={i} className="p-4 border rounded-lg">
-                        <ResultDisplay res={h.result} op={h.operation} />
+                        <ResultDisplay res={h.result} op={h.operation} is3D={is3D} />
                     </div>
                 ))}
             </CardContent>
