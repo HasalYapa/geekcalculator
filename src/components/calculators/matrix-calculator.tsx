@@ -103,41 +103,40 @@ const MatrixInput = ({ matrix, rows, cols, onSizeChange, onValueChange, label }:
         )}
       </div>
     </div>
-  );
+);
 
 const ResultDisplay = ({ result, operation }: { result: Matrix | number | null; operation: string }) => {
-    if (result === null) return null;
+  if (result === null) return null;
 
-    const title = operation ? `${operation} Result` : "Result";
-  
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>{title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-                {typeof result === 'number' ? (
-                    <p className="font-code text-2xl font-bold">{result}</p>
-                ) : (
-                    <Table>
-                        <TableBody>
-                            {result.map((row, r) => (
-                                <TableRow key={r}>
-                                    {row.map((cell, c) => (
-                                        <TableCell key={c} className="font-code text-center">
-                                            {Number(cell.toFixed(4))}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                )}
-            </CardContent>
-        </Card>
-    );
+  const title = operation ? `${operation} Result` : "Result";
+
+  return (
+      <Card>
+          <CardHeader>
+              <CardTitle>{title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+              {typeof result === 'number' ? (
+                  <p className="font-code text-2xl font-bold">{result}</p>
+              ) : (
+                  <Table>
+                      <TableBody>
+                          {result.map((row, r) => (
+                              <TableRow key={r}>
+                                  {row.map((cell, c) => (
+                                      <TableCell key={c} className="font-code text-center">
+                                          {Number(cell.toFixed(4))}
+                                      </TableCell>
+                                  ))}
+                              </TableRow>
+                          ))}
+                      </TableBody>
+                  </Table>
+              )}
+          </CardContent>
+      </Card>
+  );
 };
-
 
 export function MatrixCalculator() {
   const [rowsA, setRowsA] = useState(2);
@@ -145,8 +144,8 @@ export function MatrixCalculator() {
   const [rowsB, setRowsB] = useState(2);
   const [colsB, setColsB] = useState(2);
 
-  const [matrixA, setMatrixA] = useState<Matrix>(() => generateMatrix(rowsA, colsA));
-  const [matrixB, setMatrixB] = useState<Matrix>(() => generateMatrix(rowsB, colsB));
+  const [matrixA, setMatrixA] = useState<Matrix>([]);
+  const [matrixB, setMatrixB] = useState<Matrix>([]);
   const [result, setResult] = useState<Matrix | number | null>(null);
   const [operation, setOperation] = useState('');
 
@@ -156,15 +155,10 @@ export function MatrixCalculator() {
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
-
-  useEffect(() => {
     setMatrixA(generateMatrix(rowsA, colsA));
-  }, [rowsA, colsA]);
-
-  useEffect(() => {
     setMatrixB(generateMatrix(rowsB, colsB));
-  }, [rowsB, colsB]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const updateMatrixSize = useCallback(
     (value: string, dim: 'rows' | 'cols', matrix: 'A' | 'B') => {
@@ -173,19 +167,23 @@ export function MatrixCalculator() {
         if (matrix === 'A') {
           if (dim === 'rows') {
             setRowsA(size);
+            setMatrixA(generateMatrix(size, colsA));
           } else {
             setColsA(size);
+            setMatrixA(generateMatrix(rowsA, size));
           }
         } else {
           if (dim === 'rows') {
             setRowsB(size);
+            setMatrixB(generateMatrix(size, colsB));
           } else {
             setColsB(size);
+            setMatrixB(generateMatrix(rowsB, size));
           }
         }
       }
     },
-    []
+    [colsA, rowsA, colsB, rowsB]
   );
 
   const handleMatrixChange = useCallback(
@@ -290,7 +288,7 @@ export function MatrixCalculator() {
           </CardContent>
       </Card>
       
-      {result !== null && <ResultDisplay result={result} operation={operation} />}
+      {isClient && result !== null && <ResultDisplay result={result} operation={operation} />}
 
       {isClient && history.length > 0 && (
         <Card>
