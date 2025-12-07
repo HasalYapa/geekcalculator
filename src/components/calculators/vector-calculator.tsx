@@ -122,6 +122,7 @@ const ResultDisplay = ({
   );
 };
 
+
 export function VectorCalculator() {
   const [is3D, setIs3D] = useState(true);
   const [result, setResult] = useState<Vector | number | string | null>(null);
@@ -228,7 +229,7 @@ export function VectorCalculator() {
 
   return (
     <div className="space-y-8">
-      <Card>
+       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle>Vectors</CardTitle>
