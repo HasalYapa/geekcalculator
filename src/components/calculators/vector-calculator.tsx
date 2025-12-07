@@ -142,7 +142,7 @@ export function VectorCalculator() {
 
       if (displayRes !== null) {
         const newEntry: HistoryEntry = { operation: opName, result: displayRes, timestamp: new Date().toISOString()};
-        setHistory(prev => [newEntry, ...prev].slice(0, 5));
+        setHistory(prev => [newEntry, ...prev.filter(h => h.result !== displayRes || h.operation !== opName)].slice(0, 5));
       }
     } catch (e: any) {
       toast({ title: 'Error', description: e.message, variant: 'destructive' });
@@ -166,10 +166,10 @@ export function VectorCalculator() {
         <CardContent>
           {isClient ? (
             <Form {...form}>
-              <form className="grid md:grid-cols-2 gap-8">
+              <div className="grid md:grid-cols-2 gap-8">
                 <VectorInput id={1} label="Vector v1" is3D={is3D} />
                 <VectorInput id={2} label="Vector v2" is3D={is3D} />
-              </form>
+              </div>
             </Form>
           ) : (
             <div className="h-24 bg-muted rounded-md animate-pulse" />
