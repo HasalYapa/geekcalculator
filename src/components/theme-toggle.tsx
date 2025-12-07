@@ -10,22 +10,18 @@ export function ThemeToggle() {
 
   React.useEffect(() => {
     setMounted(true);
-    const storedTheme = localStorage.getItem('theme');
-    if (storedTheme) {
-      setTheme(storedTheme);
-    }
+    const storedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(storedTheme);
   }, []);
 
   React.useEffect(() => {
-    if (mounted) {
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      localStorage.setItem('theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
-  }, [theme, mounted]);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
@@ -33,10 +29,10 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" disabled>
-        <Icons.sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-        <Icons.moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-        <span className="sr-only">Toggle theme</span>
+        <Button variant="ghost" size="icon" disabled>
+            <Icons.sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all" />
+            <Icons.moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all" />
+            <span className="sr-only">Toggle theme</span>
       </Button>
     );
   }
