@@ -15,8 +15,8 @@ WIHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * limitations under the License.
  */
 
-import { nextJSHandler } from '@genkit-ai/next';
+import { createNextJSHandler } from '@genkit-ai/next';
 import { ai } from '@/ai/genkit';
 
-export const GET = nextJSHandler(ai);
-export const POST = nextJSHandler(ai);
+export const GET = createNextJSHandler(ai);
+export const POST = createNextJSHandler(ai);
