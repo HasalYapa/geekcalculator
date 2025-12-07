@@ -56,11 +56,8 @@ export function MatrixCalculator() {
 
   useEffect(() => {
     setIsClient(true);
-    setMatrixA(generateMatrix(rowsA, colsA));
-    setMatrixB(generateMatrix(rowsB, colsB));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+  
   useEffect(() => {
     setMatrixA(generateMatrix(rowsA, colsA));
   }, [rowsA, colsA]);
@@ -73,20 +70,18 @@ export function MatrixCalculator() {
     val: string,
     r: number,
     c: number,
-    matrix: 'A' | 'B'
+    matrixType: 'A' | 'B'
   ) => {
     const value = val === '' ? 0 : parseFloat(val);
-    if (matrix === 'A') {
-      const newMatrix = matrixA.map((row, i) =>
-        i === r ? row.map((cell, j) => (j === c ? value : cell)) : row
-      );
-      setMatrixA(newMatrix);
-    } else {
-      const newMatrix = matrixB.map((row, i) =>
-        i === r ? row.map((cell, j) => (j === c ? value : cell)) : row
-      );
-      setMatrixB(newMatrix);
-    }
+    const setMatrix = matrixType === 'A' ? setMatrixA : setMatrixB;
+
+    setMatrix(prevMatrix => {
+        const newMatrix = prevMatrix.map(row => [...row]);
+        if (newMatrix[r] && newMatrix[r][c] !== undefined) {
+            newMatrix[r][c] = value;
+        }
+        return newMatrix;
+    });
   };
   
   const updateMatrixSize = (
@@ -148,7 +143,7 @@ export function MatrixCalculator() {
     }
   };
 
-  const MatrixInput = ({ matrix, setMatrix, rows, cols, updateSize, label }: any) => (
+  const MatrixInput = ({ matrix, rows, cols, updateSize, label }: any) => (
     <div className="space-y-4">
       <h3 className="font-semibold text-lg">{label}</h3>
       <div className="flex gap-4 items-center">
