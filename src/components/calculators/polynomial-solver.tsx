@@ -172,7 +172,7 @@ export function PolynomialSolver() {
           </CardHeader>
           <CardContent className="space-y-4">
             {history.map((h, i) => (
-                <div key={i}>
+                <div key={i} className="p-4 border rounded-lg">
                     <p className="font-semibold">{h.type}: <span className="font-code">{h.equation}</span></p>
                     <ResultDisplay res={h.result} />
                 </div>

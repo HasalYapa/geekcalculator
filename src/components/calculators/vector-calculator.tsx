@@ -154,19 +154,25 @@ export function VectorCalculator() {
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle>Vectors</CardTitle>
-            <div className="flex items-center space-x-2">
-              <FormLabel>3D</FormLabel>
-              <Switch checked={is3D} onCheckedChange={setIs3D} />
-            </div>
+            {isClient && (
+              <div className="flex items-center space-x-2">
+                <FormLabel>3D</FormLabel>
+                <Switch checked={is3D} onCheckedChange={setIs3D} />
+              </div>
+            )}
           </div>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form className="grid md:grid-cols-2 gap-8">
-              <VectorInput id={1} label="Vector v1" />
-              <VectorInput id={2} label="Vector v2" />
-            </form>
-          </Form>
+          {isClient ? (
+            <Form {...form}>
+              <form className="grid md:grid-cols-2 gap-8">
+                <VectorInput id={1} label="Vector v1" />
+                <VectorInput id={2} label="Vector v2" />
+              </form>
+            </Form>
+          ) : (
+            <div className="h-24 bg-muted rounded-md animate-pulse" />
+          )}
         </CardContent>
       </Card>
       
@@ -186,9 +192,9 @@ export function VectorCalculator() {
       {isClient && history.length > 0 && (
         <Card>
             <CardHeader><CardTitle>Recent Calculations</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-4">
                 {history.map((h, i) => (
-                    <div key={i}>
+                    <div key={i} className="p-4 border rounded-lg">
                         <ResultDisplay res={h.result} op={h.operation} />
                     </div>
                 ))}
