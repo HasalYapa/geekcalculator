@@ -58,14 +58,6 @@ export function MatrixCalculator() {
     setIsClient(true);
   }, []);
 
-  useEffect(() => {
-    setMatrixA(generateMatrix(rowsA, colsA));
-  }, [rowsA, colsA]);
-
-  useEffect(() => {
-    setMatrixB(generateMatrix(rowsB, colsB));
-  }, [rowsB, colsB]);
-
   const handleMatrixChange = (
     val: string,
     r: number,
@@ -94,11 +86,17 @@ export function MatrixCalculator() {
     const size = parseInt(value, 10);
     if (size > 0 && size <= 5) {
       if (matrix === 'A') {
-        if (dim === 'rows') setRowsA(size);
-        else setColsA(size);
+        const newRows = dim === 'rows' ? size : rowsA;
+        const newCols = dim === 'cols' ? size : colsA;
+        setRowsA(newRows);
+        setColsA(newCols);
+        setMatrixA(generateMatrix(newRows, newCols));
       } else {
-        if (dim === 'rows') setRowsB(size);
-        else setColsB(size);
+        const newRows = dim === 'rows' ? size : rowsB;
+        const newCols = dim === 'cols' ? size : colsB;
+        setRowsB(newRows);
+        setColsB(newCols);
+        setMatrixB(generateMatrix(newRows, newCols));
       }
     }
   };
@@ -133,7 +131,7 @@ export function MatrixCalculator() {
       setOperation(opName);
       if(res !== null) {
           const newEntry: HistoryEntry = { operation: opName, result: res, timestamp: new Date().toISOString() };
-          setHistory(prev => [newEntry, ...prev.filter(e => e.operation !== opName)].slice(0, 5));
+          setHistory(prev => [newEntry, ...prev.filter(e => JSON.stringify(e.result) !== JSON.stringify(res))].slice(0, 5));
       }
     } catch (e: any) {
       toast({
