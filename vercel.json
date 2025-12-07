@@ -1,0 +1,22 @@
+{
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_GENKIT_ENV": "production"
+    }
+  },
+  "builds": [
+    {
+      "src": "next.config.ts",
+      "use": "@vercel/next",
+      "config": {
+        "distDir": ".next"
+      }
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/genkit/:path*",
+      "destination": "/api/genkit"
+    }
+  ]
+}
