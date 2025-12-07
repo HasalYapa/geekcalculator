@@ -45,8 +45,8 @@ export function MatrixCalculator() {
   const [rowsB, setRowsB] = useState(2);
   const [colsB, setColsB] = useState(2);
 
-  const [matrixA, setMatrixA] = useState<Matrix>(() => generateMatrix(rowsA, colsA));
-  const [matrixB, setMatrixB] = useState<Matrix>(() => generateMatrix(rowsB, colsB));
+  const [matrixA, setMatrixA] = useState<Matrix>([]);
+  const [matrixB, setMatrixB] = useState<Matrix>([]);
   const [result, setResult] = useState<Matrix | number | null>(null);
   const [operation, setOperation] = useState('');
 
@@ -56,7 +56,18 @@ export function MatrixCalculator() {
 
   useEffect(() => {
     setIsClient(true);
+    setMatrixA(generateMatrix(rowsA, colsA));
+    setMatrixB(generateMatrix(rowsB, colsB));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    setMatrixA(generateMatrix(rowsA, colsA));
+  }, [rowsA, colsA]);
+
+  useEffect(() => {
+    setMatrixB(generateMatrix(rowsB, colsB));
+  }, [rowsB, colsB]);
 
   const handleMatrixChange = (
     val: string,
@@ -86,17 +97,11 @@ export function MatrixCalculator() {
     const size = parseInt(value, 10);
     if (size > 0 && size <= 5) {
       if (matrix === 'A') {
-        const newRows = dim === 'rows' ? size : rowsA;
-        const newCols = dim === 'cols' ? size : colsA;
-        setRowsA(newRows);
-        setColsA(newCols);
-        setMatrixA(generateMatrix(newRows, newCols));
+        if (dim === 'rows') setRowsA(size);
+        else setColsA(size);
       } else {
-        const newRows = dim === 'rows' ? size : rowsB;
-        const newCols = dim === 'cols' ? size : colsB;
-        setRowsB(newRows);
-        setColsB(newCols);
-        setMatrixB(generateMatrix(newRows, newCols));
+        if (dim === 'rows') setRowsB(size);
+        else setColsB(size);
       }
     }
   };
