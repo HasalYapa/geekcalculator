@@ -52,7 +52,8 @@ export function UnitConverter() {
         UNIT_CATEGORIES[category].units as Unit[]
       );
       if (result !== null) {
-        setToValue(Number(result.toFixed(6)).toString());
+        const newToValue = Number(result.toFixed(6)).toString();
+        setToValue(newToValue);
       } else {
         setToValue('');
       }
@@ -61,16 +62,29 @@ export function UnitConverter() {
     }
   }, [fromValue, fromUnit, toUnit, category]);
 
-  const handleFromValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setFromValue(value);
-
-    const fromNum = parseFloat(value);
+  useEffect(() => {
+    const fromNum = parseFloat(fromValue);
     const toNum = parseFloat(toValue);
     if (!isNaN(fromNum) && !isNaN(toNum) && fromNum !== 0) {
-        const newEntry = { fromValue: fromNum, fromUnit, toValue: toNum, toUnit, category };
-        setHistory(prev => [newEntry, ...prev.filter(entry => JSON.stringify(entry) !== JSON.stringify(newEntry))].slice(0, 5));
+      const newEntry = {
+        fromValue: fromNum,
+        fromUnit,
+        toValue: toNum,
+        toUnit,
+        category,
+      };
+      // Add to history only if it's a new, valid conversion
+      if (history[0]?.fromValue !== fromNum || history[0]?.fromUnit !== fromUnit || history[0]?.toValue !== toNum || history[0]?.toUnit !== toUnit) {
+        setHistory((prev) =>
+          [newEntry, ...prev].slice(0, 5)
+        );
+      }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toValue]); // Only run when toValue changes
+
+  const handleFromValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFromValue(e.target.value);
   };
 
 
