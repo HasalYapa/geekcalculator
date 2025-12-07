@@ -19,7 +19,7 @@ import {
   dotProduct,
   crossProduct,
   angleBetween,
-  Vector,
+  type Vector,
 } from '@/lib/calculators/vector';
 import { useToast } from '@/hooks/use-toast';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -104,7 +104,7 @@ const ResultDisplay = ({
   let displayValue: string;
   if (typeof res === 'object') {
     displayValue = `( ${res.x.toFixed(4)}, ${res.y.toFixed(4)}${
-      is3D ? `, ${res.z.toFixed(4)}` : ''
+      is3D && typeof res.z === 'number' ? `, ${res.z.toFixed(4)}` : ''
     } )`;
   } else {
     displayValue = res.toString();
@@ -229,34 +229,33 @@ export function VectorCalculator() {
 
   return (
     <div className="space-y-8">
-       <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>Vectors</CardTitle>
-            {isClient && (
-              <div className="flex items-center space-x-2">
-                <FormLabel>3D</FormLabel>
-                <Switch checked={is3D} onCheckedChange={setIs3D} />
+      <Form {...form}>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle>Vectors</CardTitle>
+                {isClient && (
+                  <div className="flex items-center space-x-2">
+                    <FormLabel>3D</FormLabel>
+                    <Switch checked={is3D} onCheckedChange={setIs3D} />
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {isClient ? (
-            <Form {...form}>
-              <form
-                className="grid md:grid-cols-2 gap-8"
-                onSubmit={(e) => e.preventDefault()}
-              >
-                <VectorInput id={1} label="Vector v1" is3D={is3D} />
-                <VectorInput id={2} label="Vector v2" is3D={is3D} />
-              </form>
-            </Form>
-          ) : (
-            <div className="h-24 bg-muted rounded-md animate-pulse" />
-          )}
-        </CardContent>
-      </Card>
+            </CardHeader>
+            <CardContent>
+              {isClient ? (
+                <div className="grid md:grid-cols-2 gap-8">
+                  <VectorInput id={1} label="Vector v1" is3D={is3D} />
+                  <VectorInput id={2} label="Vector v2" is3D={is3D} />
+                </div>
+              ) : (
+                <div className="h-24 bg-muted rounded-md animate-pulse" />
+              )}
+            </CardContent>
+          </Card>
+        </form>
+      </Form>
 
       <Card>
         <CardHeader>
