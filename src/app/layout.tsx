@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { Toaster } from "@/components/ui/toaster"
+import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
   title: 'Geek Calculator Hub',
@@ -30,12 +31,19 @@ export default function RootLayout({
           'min-h-dvh bg-background font-body antialiased'
         )}
       >
-        <div className="relative flex min-h-dvh flex-col">
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </div>
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="relative flex min-h-dvh flex-col">
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </div>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
