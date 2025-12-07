@@ -144,8 +144,8 @@ export function MatrixCalculator() {
   const [rowsB, setRowsB] = useState(2);
   const [colsB, setColsB] = useState(2);
 
-  const [matrixA, setMatrixA] = useState<Matrix>([]);
-  const [matrixB, setMatrixB] = useState<Matrix>([]);
+  const [matrixA, setMatrixA] = useState<Matrix>(generateMatrix(rowsA, colsA));
+  const [matrixB, setMatrixB] = useState<Matrix>(generateMatrix(rowsB, colsB));
   const [result, setResult] = useState<Matrix | number | null>(null);
   const [operation, setOperation] = useState('');
 
@@ -155,39 +155,28 @@ export function MatrixCalculator() {
 
   useEffect(() => {
     setIsClient(true);
-    setMatrixA(generateMatrix(rowsA, colsA));
-    setMatrixB(generateMatrix(rowsB, colsB));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateMatrixSize = useCallback(
-    (value: string, dim: 'rows' | 'cols', matrix: 'A' | 'B') => {
+  useEffect(() => {
+    setMatrixA(generateMatrix(rowsA, colsA));
+  }, [rowsA, colsA]);
+
+  useEffect(() => {
+    setMatrixB(generateMatrix(rowsB, colsB));
+  }, [rowsB, colsB]);
+
+  const updateMatrixSize = (value: string, dim: 'rows' | 'cols', matrix: 'A' | 'B') => {
       const size = parseInt(value, 10);
       if (size > 0 && size <= 5) {
         if (matrix === 'A') {
-          if (dim === 'rows') {
-            setRowsA(size);
-            setMatrixA(generateMatrix(size, colsA));
-          } else {
-            setColsA(size);
-            setMatrixA(generateMatrix(rowsA, size));
-          }
+          dim === 'rows' ? setRowsA(size) : setColsA(size);
         } else {
-          if (dim === 'rows') {
-            setRowsB(size);
-            setMatrixB(generateMatrix(size, colsB));
-          } else {
-            setColsB(size);
-            setMatrixB(generateMatrix(rowsB, size));
-          }
+          dim === 'rows' ? setRowsB(size) : setColsB(size);
         }
       }
-    },
-    [colsA, rowsA, colsB, rowsB]
-  );
+  };
 
-  const handleMatrixChange = useCallback(
-    (val: string, r: number, c: number, matrixType: 'A' | 'B') => {
+  const handleMatrixChange = (val: string, r: number, c: number, matrixType: 'A' | 'B') => {
       const value = val === '' ? 0 : parseFloat(val);
       const setMatrix = matrixType === 'A' ? setMatrixA : setMatrixB;
       setMatrix(prevMatrix => {
@@ -197,9 +186,7 @@ export function MatrixCalculator() {
         }
         return newMatrix;
       });
-    },
-    []
-  );
+  };
 
   const performOperation = (op: 'add' | 'subtract' | 'multiply' | 'determinant' | 'inverse') => {
     let res: Matrix | number | null = null;
