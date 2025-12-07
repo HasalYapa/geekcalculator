@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -54,6 +54,11 @@ export function MatrixCalculator() {
 
   const [history, setHistory] = useLocalStorage<HistoryEntry[]>('matrix-history', []);
   const { toast } = useToast();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleMatrixChange = (
     val: string,
@@ -270,7 +275,7 @@ export function MatrixCalculator() {
       
       {result !== null && <ResultDisplay result={result} operation={operation} />}
 
-      {history.length > 0 && (
+      {isClient && history.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Recent Calculations</CardTitle>

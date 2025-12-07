@@ -34,6 +34,11 @@ export function UnitConverter() {
   const [fromValue, setFromValue] = useState('1');
   const [toValue, setToValue] = useState('');
   const [history, setHistory] = useLocalStorage<HistoryEntry[]>('unit-converter-history', []);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const currentCategory = UNIT_CATEGORIES[category];
@@ -157,7 +162,7 @@ export function UnitConverter() {
           </div>
         </CardContent>
       </Card>
-      {history.length > 0 && (
+      {isClient && history.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Recent Conversions</CardTitle>

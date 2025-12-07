@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -35,6 +35,11 @@ export function PolynomialSolver() {
     null
   );
   const [history, setHistory] = useLocalStorage<HistoryEntry[]>('polynomial-history', []);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const quadraticForm = useForm<QuadraticFormValues>({
     defaultValues: { a: '', b: '', c: '' },
@@ -160,7 +165,7 @@ export function PolynomialSolver() {
 
       {result && <ResultDisplay res={result} />}
 
-      {history.length > 0 && (
+      {isClient && history.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Recent Calculations</CardTitle>

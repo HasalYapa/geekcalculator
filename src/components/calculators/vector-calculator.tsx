@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -46,6 +46,11 @@ export function VectorCalculator() {
   const [operation, setOperation] = useState('');
   const [history, setHistory] = useLocalStorage<HistoryEntry[]>('vector-history', []);
   const { toast } = useToast();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -178,7 +183,7 @@ export function VectorCalculator() {
       
       {result !== null && <ResultDisplay res={result} op={operation} />}
       
-      {history.length > 0 && (
+      {isClient && history.length > 0 && (
         <Card>
             <CardHeader><CardTitle>Recent Calculations</CardTitle></CardHeader>
             <CardContent className="space-y-2">

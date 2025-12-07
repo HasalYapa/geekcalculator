@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,11 @@ export function StatisticsCalculator() {
   const [input, setInput] = useState('');
   const [result, setResult] = useState<StatisticsResult | null>(null);
   const [history, setHistory] = useLocalStorage<HistoryEntry[]>('statistics-history', []);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleCalculate = () => {
     const numbers = input
@@ -93,7 +98,7 @@ export function StatisticsCalculator() {
       
       {result && <ResultDisplay res={result} />}
 
-      {history.length > 0 && (
+      {isClient && history.length > 0 && (
         <Card>
             <CardHeader>
                 <CardTitle>Recent Calculations</CardTitle>
