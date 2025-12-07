@@ -39,14 +39,114 @@ const generateMatrix = (rows: number, cols: number): Matrix =>
     .fill(0)
     .map(() => Array(cols).fill(0));
 
+const MatrixInput = ({ matrix, rows, cols, onSizeChange, onValueChange, label }: {
+    matrix: Matrix;
+    rows: number;
+    cols: number;
+    onSizeChange: (value: string, dim: 'rows' | 'cols', matrix: 'A' | 'B') => void;
+    onValueChange: (val: string, r: number, c: number, matrixType: 'A' | 'B') => void;
+    label: string;
+}) => (
+    <div className="space-y-4">
+      <h3 className="font-semibold text-lg">{label}</h3>
+      <div className="flex gap-4 items-center">
+        <Select
+          value={String(rows)}
+          onValueChange={(val) => onSizeChange(val, 'rows', label.slice(-1) as 'A' | 'B')}
+        >
+          <SelectTrigger className="w-24">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {[1, 2, 3, 4, 5].map((s) => (
+              <SelectItem key={s} value={String(s)}>
+                {s} Rows
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={String(cols)}
+          onValueChange={(val) => onSizeChange(val, 'cols', label.slice(-1) as 'A' | 'B')}
+        >
+          <SelectTrigger className="w-24">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {[1, 2, 3, 4, 5].map((s) => (
+              <SelectItem key={s} value={String(s)}>
+                {s} Cols
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div
+        className="grid gap-2"
+        style={{
+          gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+        }}
+      >
+        {matrix.map((row: any, r: number) =>
+          row.map((cell: any, c: number) => (
+            <Input
+              key={`${r}-${c}`}
+              type="number"
+              value={cell === 0 ? '' : cell}
+              onChange={(e) =>
+                onValueChange(e.target.value, r, c, label.slice(-1) as 'A' | 'B')
+              }
+              className="font-code text-center"
+              placeholder="0"
+            />
+          ))
+        )}
+      </div>
+    </div>
+  );
+
+const ResultDisplay = ({ result, operation }: { result: Matrix | number | null; operation: string }) => {
+    if (result === null) return null;
+
+    const title = operation ? `${operation} Result` : "Result";
+  
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>{title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+                {typeof result === 'number' ? (
+                    <p className="font-code text-2xl font-bold">{result}</p>
+                ) : (
+                    <Table>
+                        <TableBody>
+                            {result.map((row, r) => (
+                                <TableRow key={r}>
+                                    {row.map((cell, c) => (
+                                        <TableCell key={c} className="font-code text-center">
+                                            {Number(cell.toFixed(4))}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
+            </CardContent>
+        </Card>
+    );
+};
+
+
 export function MatrixCalculator() {
   const [rowsA, setRowsA] = useState(2);
   const [colsA, setColsA] = useState(2);
   const [rowsB, setRowsB] = useState(2);
   const [colsB, setColsB] = useState(2);
 
-  const [matrixA, setMatrixA] = useState<Matrix>([]);
-  const [matrixB, setMatrixB] = useState<Matrix>([]);
+  const [matrixA, setMatrixA] = useState<Matrix>(() => generateMatrix(2, 2));
+  const [matrixB, setMatrixB] = useState<Matrix>(() => generateMatrix(2, 2));
   const [result, setResult] = useState<Matrix | number | null>(null);
   const [operation, setOperation] = useState('');
 
@@ -57,14 +157,33 @@ export function MatrixCalculator() {
   useEffect(() => {
     setIsClient(true);
   }, []);
-  
-  useEffect(() => {
-    setMatrixA(generateMatrix(rowsA, colsA));
-  }, [rowsA, colsA]);
 
-  useEffect(() => {
-    setMatrixB(generateMatrix(rowsB, colsB));
-  }, [rowsB, colsB]);
+  const updateMatrixSize = (
+    value: string,
+    dim: 'rows' | 'cols',
+    matrix: 'A' | 'B'
+  ) => {
+    const size = parseInt(value, 10);
+    if (size > 0 && size <= 5) {
+      if (matrix === 'A') {
+        if (dim === 'rows') {
+          setRowsA(size);
+          setMatrixA(generateMatrix(size, colsA));
+        } else {
+          setColsA(size);
+          setMatrixA(generateMatrix(rowsA, size));
+        }
+      } else {
+        if (dim === 'rows') {
+          setRowsB(size);
+          setMatrixB(generateMatrix(size, colsB));
+        } else {
+          setColsB(size);
+          setMatrixB(generateMatrix(rowsB, size));
+        }
+      }
+    }
+  };
 
   const handleMatrixChange = (
     val: string,
@@ -82,23 +201,6 @@ export function MatrixCalculator() {
         }
         return newMatrix;
     });
-  };
-  
-  const updateMatrixSize = (
-    value: string,
-    dim: 'rows' | 'cols',
-    matrix: 'A' | 'B'
-  ) => {
-    const size = parseInt(value, 10);
-    if (size > 0 && size <= 5) {
-      if (matrix === 'A') {
-        if (dim === 'rows') setRowsA(size);
-        else setColsA(size);
-      } else {
-        if (dim === 'rows') setRowsB(size);
-        else setColsB(size);
-      }
-    }
   };
 
   const performOperation = (op: 'add' | 'subtract' | 'multiply' | 'determinant' | 'inverse') => {
@@ -143,97 +245,6 @@ export function MatrixCalculator() {
     }
   };
 
-  const MatrixInput = ({ matrix, rows, cols, updateSize, label }: any) => (
-    <div className="space-y-4">
-      <h3 className="font-semibold text-lg">{label}</h3>
-      <div className="flex gap-4 items-center">
-        <Select
-          value={String(rows)}
-          onValueChange={(val) => updateSize(val, 'rows', label.slice(-1))}
-        >
-          <SelectTrigger className="w-24">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {[1, 2, 3, 4, 5].map((s) => (
-              <SelectItem key={s} value={String(s)}>
-                {s} Rows
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={String(cols)}
-          onValueChange={(val) => updateSize(val, 'cols', label.slice(-1))}
-        >
-          <SelectTrigger className="w-24">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {[1, 2, 3, 4, 5].map((s) => (
-              <SelectItem key={s} value={String(s)}>
-                {s} Cols
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div
-        className="grid gap-2"
-        style={{
-          gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-        }}
-      >
-        {matrix.map((row: any, r: number) =>
-          row.map((cell: any, c: number) => (
-            <Input
-              key={`${r}-${c}`}
-              type="number"
-              value={cell === 0 ? '' : cell}
-              onChange={(e) =>
-                handleMatrixChange(e.target.value, r, c, label.slice(-1))
-              }
-              className="font-code text-center"
-              placeholder="0"
-            />
-          ))
-        )}
-      </div>
-    </div>
-  );
-  
-  const ResultDisplay = ({ result, operation }: { result: Matrix | number | null; operation: string }) => {
-    if (result === null) return null;
-  
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>{operation} Result</CardTitle>
-            </CardHeader>
-            <CardContent>
-                {typeof result === 'number' ? (
-                    <p className="font-code text-2xl font-bold">{result}</p>
-                ) : (
-                    <Table>
-                        <TableBody>
-                            {result.map((row, r) => (
-                                <TableRow key={r}>
-                                    {row.map((cell, c) => (
-                                        <TableCell key={c} className="font-code text-center">
-                                            {Number(cell.toFixed(4))}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                )}
-            </CardContent>
-        </Card>
-    );
-};
-
-
   return (
     <div className="space-y-8">
       <Card>
@@ -241,25 +252,27 @@ export function MatrixCalculator() {
           <CardTitle>Matrices</CardTitle>
         </CardHeader>
         <CardContent className="grid md:grid-cols-2 gap-8">
-          {isClient ? (
+          {!isClient ? (
+            <div className="md:col-span-2 h-48 bg-muted rounded-md animate-pulse" />
+          ) : (
             <>
               <MatrixInput
                 matrix={matrixA}
                 rows={rowsA}
                 cols={colsA}
-                updateSize={updateMatrixSize}
+                onSizeChange={updateMatrixSize}
+                onValueChange={handleMatrixChange}
                 label="Matrix A"
               />
               <MatrixInput
                 matrix={matrixB}
                 rows={rowsB}
                 cols={colsB}
-                updateSize={updateMatrixSize}
+                onSizeChange={updateMatrixSize}
+                onValueChange={handleMatrixChange}
                 label="Matrix B"
               />
             </>
-          ) : (
-            <div className="md:col-span-2 h-48 bg-muted rounded-md animate-pulse" />
           )}
         </CardContent>
       </Card>
