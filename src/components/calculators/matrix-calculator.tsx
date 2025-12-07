@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -145,8 +145,8 @@ export function MatrixCalculator() {
   const [rowsB, setRowsB] = useState(2);
   const [colsB, setColsB] = useState(2);
 
-  const [matrixA, setMatrixA] = useState<Matrix>(() => generateMatrix(2, 2));
-  const [matrixB, setMatrixB] = useState<Matrix>(() => generateMatrix(2, 2));
+  const [matrixA, setMatrixA] = useState<Matrix>(() => generateMatrix(rowsA, colsA));
+  const [matrixB, setMatrixB] = useState<Matrix>(() => generateMatrix(rowsB, colsB));
   const [result, setResult] = useState<Matrix | number | null>(null);
   const [operation, setOperation] = useState('');
 
@@ -158,50 +158,50 @@ export function MatrixCalculator() {
     setIsClient(true);
   }, []);
 
-  const updateMatrixSize = (
-    value: string,
-    dim: 'rows' | 'cols',
-    matrix: 'A' | 'B'
-  ) => {
-    const size = parseInt(value, 10);
-    if (size > 0 && size <= 5) {
-      if (matrix === 'A') {
-        if (dim === 'rows') {
-          setRowsA(size);
-          setMatrixA(generateMatrix(size, colsA));
+  useEffect(() => {
+    setMatrixA(generateMatrix(rowsA, colsA));
+  }, [rowsA, colsA]);
+
+  useEffect(() => {
+    setMatrixB(generateMatrix(rowsB, colsB));
+  }, [rowsB, colsB]);
+
+  const updateMatrixSize = useCallback(
+    (value: string, dim: 'rows' | 'cols', matrix: 'A' | 'B') => {
+      const size = parseInt(value, 10);
+      if (size > 0 && size <= 5) {
+        if (matrix === 'A') {
+          if (dim === 'rows') {
+            setRowsA(size);
+          } else {
+            setColsA(size);
+          }
         } else {
-          setColsA(size);
-          setMatrixA(generateMatrix(rowsA, size));
-        }
-      } else {
-        if (dim === 'rows') {
-          setRowsB(size);
-          setMatrixB(generateMatrix(size, colsB));
-        } else {
-          setColsB(size);
-          setMatrixB(generateMatrix(rowsB, size));
+          if (dim === 'rows') {
+            setRowsB(size);
+          } else {
+            setColsB(size);
+          }
         }
       }
-    }
-  };
+    },
+    []
+  );
 
-  const handleMatrixChange = (
-    val: string,
-    r: number,
-    c: number,
-    matrixType: 'A' | 'B'
-  ) => {
-    const value = val === '' ? 0 : parseFloat(val);
-    const setMatrix = matrixType === 'A' ? setMatrixA : setMatrixB;
-
-    setMatrix(prevMatrix => {
+  const handleMatrixChange = useCallback(
+    (val: string, r: number, c: number, matrixType: 'A' | 'B') => {
+      const value = val === '' ? 0 : parseFloat(val);
+      const setMatrix = matrixType === 'A' ? setMatrixA : setMatrixB;
+      setMatrix(prevMatrix => {
         const newMatrix = prevMatrix.map(row => [...row]);
         if (newMatrix[r] && newMatrix[r][c] !== undefined) {
-            newMatrix[r][c] = value;
+          newMatrix[r][c] = value;
         }
         return newMatrix;
-    });
-  };
+      });
+    },
+    []
+  );
 
   const performOperation = (op: 'add' | 'subtract' | 'multiply' | 'determinant' | 'inverse') => {
     let res: Matrix | number | null = null;
